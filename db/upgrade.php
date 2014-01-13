@@ -484,5 +484,24 @@ function xmldb_certificate_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2012090901, 'certificate');
     }
 
+    if ($oldversion < 2014011303) {
+        $table = new xmldb_table('certificate');
+
+        // Add field to specify a from address for e-mail.  This may be
+        // necessary if you're using a mail relay service that's set up to send
+		// mail from pre-defined addresses only.
+		// Options are:
+		//   0: default from address
+		//   1: Administrator
+        $field = new xmldb_field('emailfrom');
+        $field->set_attributes(XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0', 'emailothers');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Certificate savepoint reached
+        upgrade_mod_savepoint(true, 2014011303, 'certificate');
+    }
+
     return true;
 }

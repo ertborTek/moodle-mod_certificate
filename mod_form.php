@@ -61,6 +61,11 @@ class mod_certificate_mod_form extends moodleform_mod {
         $mform->setType('emailothers', PARAM_TEXT);
         $mform->addHelpButton('emailothers', 'emailothers', 'certificate');
 
+        $emailfromoptions = array( 0 => get_string('default', 'certificate'), 1 => get_string('admin', 'certificate'));
+        $mform->addElement('select', 'emailfrom', get_string('emailfrom', 'certificate'), $emailfromoptions);
+        $mform->setDefault('emailfrom', 0);
+        $mform->addHelpButton('emailfrom', 'emailfrom', 'certificate');
+
         $deliveryoptions = array( 0 => get_string('openbrowser', 'certificate'), 1 => get_string('download', 'certificate'), 2 => get_string('emailcertificate', 'certificate'));
         $mform->addElement('select', 'delivery', get_string('delivery', 'certificate'), $deliveryoptions);
         $mform->setDefault('delivery', 0);

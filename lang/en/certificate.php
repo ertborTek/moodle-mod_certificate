@@ -87,18 +87,25 @@ $string['download'] = 'Force download';
 $string['emailcertificate'] = 'Email (Must also choose save!)';
 $string['emailothers'] = 'Email Others';
 $string['emailothers_help'] = 'Enter the email addresses here, separated by a comma, of those who should be alerted with an email whenever students receive a certificate.';
+$string['emailfrom'] = 'Email From Address';
+$string['default'] = 'Default';
+$string['admin'] = 'Administrator';
+$string['emailfrom_help'] = 'The from address is set to:
+
+Default: Uses the default means of determining the from address, usually the address of the student receiving the certificate.
+Admin: Uses the address of the Admin user account.';
 $string['emailstudenttext'] = 'Attached is your certificate for {$a->course}.';
 $string['emailteachers'] = 'Email Teachers';
 $string['emailteachers_help'] = 'If enabled, then teachers are alerted with an email whenever students receive a certificate.';
 $string['emailteachermail'] = '
-{$a->student} has received their certificate: \'{$a->certificate}\'
+{$a->student} ({$a->studentemail}) has received a certificate: \'{$a->certificate}\'
 for {$a->course}.
 
 You can review it here:
 
     {$a->url}';
 $string['emailteachermailhtml'] = '
-{$a->student} has received their certificate: \'<i>{$a->certificate}</i>\'
+{$a->student} ({$a->studentemail}) has received a certificate: \'<i>{$a->certificate}</i>\'
 for {$a->course}.
 
 You can review it here:

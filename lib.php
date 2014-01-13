@@ -346,7 +346,14 @@ function certificate_email_teachers($course, $certificate, $certrecord, $cm) {
             $info->course = format_string($course->fullname,true);
             $info->certificate = format_string($certificate->name,true);
             $info->url = $CFG->wwwroot.'/mod/certificate/report.php?id='.$cm->id;
-            $from = $USER;
+
+			// Check if mail should be send from the administrator.
+			if ($certificate->emailfrom == 1) {
+                $from = get_admin();
+			} else {
+				$from = $USER;
+			}
+
             $postsubject = $strawarded . ': ' . $info->student . ' -> ' . $certificate->name;
             $posttext = certificate_email_teachers_text($info);
             $posthtml = ($teacher->mailformat == 1) ? certificate_email_teachers_html($info) : '';
@@ -379,12 +386,22 @@ function certificate_email_others($course, $certificate, $certrecord, $cm) {
                 if (validate_email($other)) {
                     $destination = new stdClass;
                     $destination->email = $other;
+					$destination->id = -1; // Without an id, email_user will fail.
                     $info = new stdClass;
                     $info->student = fullname($USER);
+					$info->studentemail = $USER->email;
                     $info->course = format_string($course->fullname, true);
                     $info->certificate = format_string($certificate->name, true);
                     $info->url = $CFG->wwwroot.'/mod/certificate/report.php?id='.$cm->id;
-                    $from = $USER;
+
+					// Check if mail should be send from the administrator.  If not, send from a
+					// teacher if one exists.
+					if ($certificate->emailfrom == 1) {
+	                    $from = get_admin();
+					} else {
+						$from = $USER;
+					}
+
                     $postsubject = $strawarded . ': ' . $info->student . ' -> ' . $certificate->name;
                     $posttext = certificate_email_teachers_text($info);
                     $posthtml = certificate_email_teachers_html($info);
@@ -434,24 +451,31 @@ function certificate_email_teachers_html($info) {
 function certificate_email_student($course, $certificate, $certrecord, $context) {
     global $DB, $USER;
 
-    // Get teachers
-    if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
-        '', '', '', '', false, true)) {
-        $users = sort_by_roleassignment_authority($users, $context);
-        $teacher = array_shift($users);
-    }
+	// Check if mail should be send from the administrator.  If not, send from a
+	// teacher if one exists.
+	if ($certificate->emailfrom == 1) {
+        $teacher = get_admin();
+	} else {
+	    // Get teachers
+	    if ($users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
+	        '', '', '', '', false, true)) {
+	        $users = sort_by_roleassignment_authority($users, $context);
+	        $teacher = array_shift($users);
+	    }
 
-    // If we haven't found a teacher yet, look for a non-editing teacher in this course.
-    if (empty($teacher) && $users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
-        '', '', '', '', false, true)) {
-        $users = sort_by_roleassignment_authority($users, $context);
-        $teacher = array_shift($users);
-    }
+	    // If we haven't found a teacher yet, look for a non-editing teacher in this course.
+	    if (empty($teacher) && $users = get_users_by_capability($context, 'moodle/course:update', 'u.*', 'u.id ASC',
+	        '', '', '', '', false, true)) {
+	        $users = sort_by_roleassignment_authority($users, $context);
+	        $teacher = array_shift($users);
+	    }
 
-    // Ok, no teachers, use administrator name
-    if (empty($teacher)) {
-        $teacher = fullname(get_admin());
-    }
+	    // Ok, no teachers, use administrator name
+	    if (empty($teacher)) {
+	        $teacher = fullname(get_admin());
+	    }
+	}
+
 
     $info = new stdClass;
     $info->username = fullname($USER);
